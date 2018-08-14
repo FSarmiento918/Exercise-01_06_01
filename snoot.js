@@ -11,7 +11,7 @@
 var twentyNine = document.createDocumentFragment();
 var thirty = document.createDocumentFragment();
 var thirtyOne = document.createDocumentFragment();
-var formValidity = false;
+var formValidity = true;
 
 //function to turn off select list defaults
 function removeSelectDefaults() {
@@ -39,6 +39,9 @@ function updateDays() {
     var dates = deliveryDay.getElementsByTagName("option");
     var deliveryMonth = document.getElementById("delivMo");
     var deliveryYear = document.getElementById("delivYr");
+    if (deliveryMonth.selectedIndex === -1) {
+        return;
+    }
     var selectedMonth = deliveryMonth.options[deliveryMonth.selectedIndex].value;
     while (dates[28]) {
         deliveryDay.removeChild(dates[28]);
@@ -116,12 +119,56 @@ function validateAddress(fieldsetId) {
                 currentElement.style.background = "white";
             }
         }
+        //validate select list
+        currentElement = document.querySelectorAll("#" + fieldsetId + " select")[0];
+        //blank 
+        if (currentElement.selectedIndex === -1) {
+            currentElement.style.border = "1px solid red";
+            fieldsetValidity = false;
+        }
+        //valid
+        else {
+            currentElement.style.border = "white";
+            fieldsetValidity = true;
+        }
         if (fieldsetValidity === false) {
             if (fieldsetId === "billingAddress") {
                 throw "Please complete all Billing Address information";
             } else {
                 throw "Please complete all Delivery Address information"
             }
+        } else {
+            errorDiv.style.display = "none";
+            errorDiv.innerHTML = "";
+        }
+    } catch (msg) {
+        errorDiv.style.display = "block";
+        errorDiv.innerHTML = msg;
+        formValidity = false;
+    }
+}
+
+//function to validate delivery date
+function validateDeliveryDate() {
+    var selectElements = document.querySelectorAll("#deliveryDate" + " select");
+    var errorDiv = document.querySelectorAll("#deliveryDate" + " .errorMessage")[0];
+    var fieldsetValidity = true;
+    var elementCount = selectElements.length;
+    var currentElement = null;
+    try {
+        // loop required select elements
+        for (var i = 0; i < elementCount; i++) {
+            currentElement = selectElements[i];
+            // test for blank
+            if (currentElement.selectedIndex === -1) {
+                currentElement.style.border = "1px solid red";
+                fieldsetValidity = false;
+            } else {
+                currentElement.style.border = "";
+            }
+        }
+        if (fieldsetValidity === false) {
+            throw "Please specify a delivery date"
         } else {
             errorDiv.style.display = "none";
             errorDiv.innerHTML = "";
@@ -140,6 +187,10 @@ function validateForm(evt) {
     } else {
         evt.returnValue = false;
     }
+
+    validateAddress("billingAddress");
+    validateAddress("deliveryAddress");
+    validateDeliveryDate();
 
     if (formValidity === true) {
         document.getElementById("errorText").innerHTML = "";
