@@ -192,18 +192,48 @@ function validateMessage() {
             errorDiv.innerHTML = "";
             msgBox.style.background = "white";
         }
-        //commented for future sake and is just repeated from the previous code
-        /*  if (fieldsetValidity === false) {
-                throw "Please enter your Custom Message text";
-            } else {
-                errorDiv.style.display = "none";
-                errorDiv.innerHTML = "";
-            }*/
     } catch (msg) {
         errorDiv.style.display = "block";
         errorDiv.innerHTML = msg;
         msgBox.style.background = "rgb(255,233,233)";
         formValidity = false;
+    }
+}
+//function to validate create account
+function validateCreateAccount() {
+    var errorDiv = document.querySelectorAll("#createAccount" + " .errorMessage")[0];
+    var userNameElement = document.getElementById("username");
+    var pass1Element = document.getElementById("pass1");
+    var pass2Element = document.getElementById("pass2");
+    userNameElement.style.background = "white";
+    pass1Element.style.background = "white";
+    pass2Element.style.background = "white";
+    var passwordMismatch = false
+    var invColor = "rgb(255,233,255)";
+    var fieldsetValidity = true;
+    try {
+        if (userNameElement.value !== "" && pass1Element.value !== "" && pass2Element.value !== "") {
+            if (pass1Element.value !== pass2Element.value) {
+                passwordMismatch = true;
+                throw "Password entered do not match, please re-enter";
+            }
+        } else if (userNameElement.value === "" && pass1Element.value === "" && pass2Element.value === "") {
+            fieldsetValidity = true;
+        } else {
+            fieldsetValidity = false;
+            throw "Please enter all fields to Create Account";
+        }
+    } catch (msg) {
+        errorDiv.style.display = "block";
+        errorDiv.innerHTML = msg;
+        pass1Element.style.background = invColor;
+        pass2Element.style.background = invColor;
+        formValidity = false;
+        if (passwordMismatch) {
+            userNameElement.style.background = "white";
+        } else {
+            userNameElement.style.background = invColor;
+        }
     }
 }
 
@@ -279,6 +309,7 @@ function validateForm(evt) {
     validateAddress("deliveryAddress");
     validateMessage();
     validatePayment();
+    validateCreateAccount();
 
     if (formValidity === true) {
         document.getElementById("errorText").innerHTML = "";
